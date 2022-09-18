@@ -27,6 +27,9 @@ OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
 // Variables to store temperature values
+String sensor1String = "";
+String sensor2String = "";
+String sensor3String = "";
 String temperatureC = "";
 
 // Timer variables
@@ -46,27 +49,21 @@ const char* password = "Jidion123";
 //Create an AsyncWebServer object on port 80.
 AsyncWebServer server(80);
 
-String readDSTemperatureC() {
+void readDSTemperatureC() {
   // Call sensors.requestTemperatures() to issue a global temperature and Requests to all devices on the bus
   sensors.requestTemperatures(); 
-  float tempC = sensors.getTempCByIndex(0);
-
-  if(tempC == -127.00) {
-    Serial.println("Failed to read from DS18B20 sensor");
-    return "--";
-  } else {
-    Serial.print("Temperature Celsius: ");
-    Serial.println(tempC); 
-  }
-  return String(tempC);
+  temperatureC = sensors.getTempCByIndex(0);
+  sensor1String = sensors.getTempCByIndex(0);
+  sensor2String = sensors.getTempCByIndex(1);
+  sensor3String = sensors.getTempCByIndex(2);   
 }
 
 // Replaces placeholder with DS18B20 values
 String processor(const String& var){
   // Serial.println(var);
-  if(var == "TEMPERATUREA1"){return temperatureC;}
-  else if(var == "TEMPERATUREA2"){return temperatureC;}
-  else if(var == "TEMPERATUREA3"){return temperatureC;}
+  if(var == "TEMPERATUREA1"){return sensor1String;}
+  else if(var == "TEMPERATUREA2"){return sensor2String;}
+  else if(var == "TEMPERATUREA3"){return sensor3String;}
   else if(var == "TEMPERATUREA4"){return temperatureC;}
   else if(var == "TEMPERATUREA5"){return temperatureC;}
   else if(var == "TEMPERATUREB1"){return temperatureC;}
@@ -107,7 +104,7 @@ void setup(){
   // Start up the DS18B20 library
   sensors.begin();
 
-  temperatureC = readDSTemperatureC();
+  readDSTemperatureC();
 
    //Connect to Wi-Fi
   WiFi.begin(ssid,password);
@@ -155,13 +152,13 @@ void setup(){
   });
 
   server.on("/temperaturea1", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", temperatureC.c_str());
+    request->send_P(200, "text/plain", sensor1String.c_str());
   });
   server.on("/temperaturea2", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", temperatureC.c_str());
+    request->send_P(200, "text/plain", sensor2String.c_str());
   });
   server.on("/temperaturea3", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", temperatureC.c_str());
+    request->send_P(200, "text/plain", sensor3String.c_str());
   });
   server.on("/temperaturea4", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", temperatureC.c_str());
@@ -237,7 +234,7 @@ void setup(){
 
 void loop(){ 
   if ((millis() - lastTime) > timerDelay) {
-    temperatureC = readDSTemperatureC();
+    readDSTemperatureC();
     lastTime = millis();
   }  
 }
