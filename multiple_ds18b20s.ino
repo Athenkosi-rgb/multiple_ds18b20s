@@ -56,6 +56,9 @@ void readDSTemperatureC() {
   sensor1String = sensors.getTempCByIndex(0);
   sensor2String = sensors.getTempCByIndex(1);
   sensor3String = sensors.getTempCByIndex(2);   
+
+  Serial.println("Room Temperature (°C) = ");
+  Serial.println(temperatureC);
 }
 
 // Replaces placeholder with DS18B20 values
